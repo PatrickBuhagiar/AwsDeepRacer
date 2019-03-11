@@ -189,8 +189,12 @@ class DeepRacerEnv(gym.Env):
     def reward_function(self, on_track, x, y, distance_from_center, car_orientation, progress, steps,
                         throttle, steering, track_width, waypoints, closest_waypoints):
         reward = 1e-3
-        if 0.0 <= distance_from_center <= 0.03:
+        if 0.0 <= distance_from_center <= 0.02:
             reward = 1.0
+        elif 0.02 <= distance_from_center <= 0.03:
+            reward = 0.3
+        elif 0.03 <= distance_from_center <= 0.05:
+            reward = 0.1
 
         # add steering penalty
         if abs(steering) > 0.5:
@@ -199,6 +203,9 @@ class DeepRacerEnv(gym.Env):
         # add throttle penalty
         if throttle < 0.5:
             reward *= 0.80
+
+        if not on_track:
+            reward *= 0.33
 
         return reward
 
