@@ -187,27 +187,31 @@ class DeepRacerEnv(gym.Env):
         self.ack_publisher.publish(ack_msg)
 
     def reward_function(self, on_track, x, y, distance_from_center, car_orientation, progress, steps,
-                        throttle, steering, track_width, waypoints, closest_waypoints):
+                        throttle, steering, track_width, waypoints, closest_waypoint):
+
         reward = 1e-3
-        if 0.0 <= distance_from_center <= 0.02:
-            reward = 1.0
-        elif 0.02 <= distance_from_center <= 0.03:
-            reward = 0.3
-        elif 0.03 <= distance_from_center <= 0.05:
-            reward = 0.1
+        if 0.0 <= distance_from_center <= 0.05:
+            reward = 3* math.exp(-50 * distance_from_center)
 
         # add steering penalty
-        if abs(steering) > 0.5:
-            reward *= 0.80
+        if math.fabs(steering) > 0.5:
+            reward *= 0.50
 
         # add throttle penalty
-        if throttle < 0.5:
-            reward *= 0.80
+        if 0.0 <= throttle < 0.3:
+            reward *= 0.6
+        elif 0.3 <= throttle < 0.5:
+            reward *= 1.1
+        else:
+            reward *= 0.5
 
-        if not on_track:
-            reward *= 0.33
+        waypoint_yaw = waypoints[closest_waypoint][-1]
 
-        return reward
+        # penalize reward if orientation of the vehicle deviates way too much when compared to ideal orientation
+        if math.fabs(car_orientation - waypoint_yaw) >= math.radians(5):
+            reward *= 0.5
+
+        return float(reward)
 
     def infer_reward_state(self, steering_angle, throttle):
         # Wait till we have a image from the camera

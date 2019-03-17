@@ -30,16 +30,16 @@ agent_params = ClippedPPOAgentParameters()
 
 agent_params.memory.max_size = (MemoryGranularity.Transitions, 10**5)
 
-agent_params.network_wrappers['main'].learning_rate = 0.0003
+agent_params.network_wrappers['main'].learning_rate = 0.001
 agent_params.network_wrappers['main'].input_embedders_parameters['observation'].activation_function = 'relu'
 agent_params.network_wrappers['main'].middleware_parameters.activation_function = 'relu'
-agent_params.network_wrappers['main'].batch_size = 64
+agent_params.network_wrappers['main'].batch_size = 256
 agent_params.network_wrappers['main'].optimizer_epsilon = 1e-5
 agent_params.network_wrappers['main'].adam_optimizer_beta2 = 0.999
 
 agent_params.algorithm.clip_likelihood_ratio_using_epsilon = 0.2
 agent_params.algorithm.clipping_decay_schedule = LinearSchedule(1.0, 0, 1000000)
-agent_params.algorithm.beta_entropy = 0.01  # also try 0.001
+agent_params.algorithm.beta_entropy = 0.001  # also try 0.001
 agent_params.algorithm.gae_lambda = 0.95
 agent_params.algorithm.discount = 0.999
 agent_params.algorithm.optimization_epochs = 10
